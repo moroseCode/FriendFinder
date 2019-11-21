@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<head>
+    <title>The Force Is Strong Here</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css?family=Faster+One|Geostar+Fill|Press+Start+2P&display=swap" rel="stylesheet"> 
+    <!-- <link rel="stylesheet" href="assets/css/style.css"> -->
+    
+</head>
+<body class="background">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 titleContainer">
+                <div id="title">FriendFinder Survey</div>
+                <hr>
+            </div>
+        </div>
+        <div class="row aboutRow">
+            <div class="col-md-12">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="friendName">Name</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="John Q Public" aria-label="name" aria-describedby="basic-addon1">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="photoLink">Photo Link</span>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Enter url for a picture" aria-label="photoLink" aria-describedby="basic-addon1">
+                </div>
+            </div>
+        </div>
+        <div class="row questionRow">
+
+        </div>
+        <div class="row submitRow">
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="friendModal" tabindex="-1" role="dialog" aria-labelledby="friendModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalCenterTitle">Your New Best Friend</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body palMod">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+
+        // $(".subBtn").click(function(){
+        //     var radioVals = []
+        //     for(var i = 0; i < questions.length; i++){
+
+        //     }
+        // });
+
+    function makeSurvey() {
+        $.ajax({ url: "/api/questions", method: "GET" })
+        .then(function(data) {
+            var questions = data.questions;
+            var answers = data.answers;
+            console.log(questions)
+            for(var i = 0; i < questions.length; i++) {
+                function radioBtn(){
+                    var $options = $("<div>")
+                    for(var j = 0; j < 5; j++){
+                        $("<div>", { class: 'form-check form-check-inline' }).append(
+                            // $("<input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value='a1'>")
+                            $("<input>", { class: 'form-check-input', type: 'radio', name: 'inlineRadio' + questions[i].id, id: answers[j].id, value: answers[j].value}),
+                            $("<label>", { class: "form-check-label", for: answers[j].id }).text(answers[j].value)
+                        ).appendTo($options)
+                    };
+                    return $options
+                }
+            
+
+            $(".questionRow").append(
+                $("<div id='" + questions[i].id + "' class='col-md-12 cols qCol'></div>").append(
+                    $("<div class=''></div>").append(
+                        $('<h3>' + questions[i].text + '</h3>'),
+                        radioBtn()
+                    ),
+                ),
+                
+            )
+            };
+            $(".submitRow").append(
+                $("<button/>", { type: 'button', class: 'btn btn-primary', text: 'Find Best Friend', id: 'subBtn', 'data-toggle': 'modal', 'data-target': 'friendModal'}).click(function() {
+                    console.log("here")
+                    var answers = [];
+                    $(":checked").each(function() {
+                        answers.push($(this).val());
+                    });
+                    console.log(answers)
+                    
+                    var addFriend = {
+                        name: $("#friendName").val().trim(),
+                        photo: $("#photoLink").val().trim(),
+                        scores: answers
+                    }
+
+                    $.post("/api/friends", addFriend)
+                        .then(function(data) {
+                            console.log("survey.html", data);
+                        })
+                        .fail(function(e) {
+                            console.log(e)
+                        })
+                    
+                    findFriend(answers);
+
+                    $("#palMod").append(
+                        $("<img>", {src: data.photo, alt: 'Picture of ' + data.name })
+                    ).height(200).width(200)
+                })
+            )
+        })
+    };
+
+    function findFriend(scores) {
+        $.ajax({ url: "/api/friends", method: "GET" })
+        .then(function(friendData) {
+        for(var fr = 0; fr < friendData.length; fr++){
+            var friendScore = friendData[fr].scores;
+            console.log(friendScore)
+            var scoreDiff = [];
+            // console.log(friendData[fr].scores);
+            console.log(friendScore[fr])
+            console.log(scores);
+            for(var sc = 0; sc < friendScore.length; sc++){
+                scoreDiff.push(Math.abs(scores[sc] - friendScore[sc]));
+            }
+            scoreDiff = scoreDiff.reduce(getSum, 0);
+            console.log(scoreDiff)
+        }
+        });
+    };
+
+    function getSum(total, num) {
+        return total + num;
+    };
+    makeSurvey();
+    </script>
+</body>
+</html>

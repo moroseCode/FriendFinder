@@ -1,0 +1,35 @@
+            type: "checkbox",
+            name: "q0",
+            message: "Cereal is a soup."
+            choices: [1, 2, 3, 4, 5]
+        },
+        {
+            type: "checkbox",
+            name: "q1",
+            message: "A hotdog is an open-faced sandwich."
+            choices: [1, 2, 3, 4, 5]
+        },
+        {
+            type: "checkbox",
+            name: "q2",
+            message: "Any book is a children's book if the child can read."
+            choices: [1, 2, 3, 4, 5]
+        },
+        {
+            type: "checkbox",
+            name: "q3",
+            message: "With a name like Smuckers, it has to be good."
+            choices: [1, 2, 3, 4, 5]
+        },
+        {
+            type: "checkbox",
+            name: "q4",
+            message: "If houses were pants, closets would be the pockets."
+            choices: [1, 2, 3, 4, 5]
+        },
+        {
+            type: "checkbox",
+            name: "q5",
+            message: "Food trucks should drive around the same way ice cream trucks do."
+            choices: [1, 2, 3, 4, 5]
+        },
