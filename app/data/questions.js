@@ -30,7 +30,15 @@ var questions = [
     },
     {
         id: "q8",
-        text: ""
+        text: "73% of statistics are made up on the spot"
+    },
+    {
+        id: "q9",
+        text: "60% of the time it works every time."
+    },
+    {
+        id: "q10",
+        text: "You do want fries with that."
     }
 ];
 
