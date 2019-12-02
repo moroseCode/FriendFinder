@@ -6,7 +6,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css?family=Faster+One|Geostar+Fill|Press+Start+2P&display=swap" rel="stylesheet"> 
-    <!-- <link rel="stylesheet" href="assets/css/style.css"> -->
+    <link rel="stylesheet" type="text/css" href="css/survey.css">
     
 </head>
 <body class="background">
@@ -21,15 +21,15 @@
             <div class="col-md-12">
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" id="friendName">Name</span>
+                        <span class="input-group-text" >Name</span>
                     </div>
-                    <input type="text" class="form-control" placeholder="John Q Public" aria-label="name" aria-describedby="basic-addon1">
+                    <input type="text" class="form-control" placeholder="John Q Public" aria-label="name" aria-describedby="basic-addon1" id="friendName">
                 </div>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <span class="input-group-text" id="photoLink">Photo Link</span>
+                        <span class="input-group-text" >Photo Link</span>
                     </div>
-                    <input type="text" class="form-control" placeholder="Enter url for a picture" aria-label="photoLink" aria-describedby="basic-addon1">
+                    <input type="text" class="form-control" placeholder="Enter url for a picture" aria-label="photoLink" aria-describedby="basic-addon1" id="photoLink">
                 </div>
             </div>
         </div>
@@ -46,26 +46,18 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalCenterTitle">Your New Best Friend</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body palMod">
 
                 </div>
+
+
             </div>
         </div>
     </div>
 
     <script>
-
-
-        // $(".subBtn").click(function(){
-        //     var radioVals = []
-        //     for(var i = 0; i < questions.length; i++){
-
-        //     }
-        // });
 
     function makeSurvey() {
         $.ajax({ url: "/api/questions", method: "GET" })
@@ -73,10 +65,13 @@
             var questions = data.questions;
             var answers = data.answers;
             console.log(questions)
-            for(var i = 0; i < questions.length; i++) {
-                function radioBtn(){
+            for(var i = 0; i < questions.length; i++) 
+            {
+                function radioBtn()
+                {
                     var $options = $("<div>")
-                    for(var j = 0; j < 5; j++){
+                    for(var j = 0; j < 5; j++)
+                    {
                         $("<div>", { class: 'form-check form-check-inline' }).append(
                             // $("<input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value='a1'>")
                             $("<input>", { class: 'form-check-input', type: 'radio', name: 'inlineRadio' + questions[i].id, id: answers[j].id, value: answers[j].value}),
@@ -102,7 +97,7 @@
                     console.log("here")
                     var answers = [];
                     $(":checked").each(function() {
-                        answers.push($(this).val());
+                        answers.push( parseInt($(this).val() ));
                     });
                     console.log(answers)
                     
@@ -113,39 +108,62 @@
                     }
 
                     $.post("/api/friends", addFriend)
-                        .then(function(data) {
-                            console.log("survey.html", data);
-                        })
-                        .fail(function(e) {
-                            console.log(e)
-                        })
-                    
-                    findFriend(answers);
+                        findFriend(answers).then(function(bestMatch){
+                            $(".palMod").append(
+                                    $("<img>", {src: bestMatch.photo, alt: 'Picture of ' + bestMatch.name }).height('auto').width('auto'),
+                                    $("<h3>").text(bestMatch.name).css("text-align", "center")
+                                );
 
-                    $("#palMod").append(
-                        $("<img>", {src: data.photo, alt: 'Picture of ' + data.name })
-                    ).height(200).width(200)
+                            $("#friendModal").modal('show');
+                            // $('#modal').on('show.bs.modal', function () {
+                            //     $(this).find('.modal-body').css({
+                            //         width:'auto', //probably not needed
+                            //         height:'auto' !important, //probably not needed 
+                            //         'max-height':'100%'
+                            //     });
+                            // });
+                        });
+
                 })
+
             )
         })
     };
 
-    function findFriend(scores) {
-        $.ajax({ url: "/api/friends", method: "GET" })
+    function findFriend(scores) 
+    {
+        var bestmatch=100000;
+        var bestmatchindex;
+       return $.ajax({ url: "/api/friends", method: "GET" })
         .then(function(friendData) {
-        for(var fr = 0; fr < friendData.length; fr++){
+        for(var fr = 0; fr < friendData.length-1; fr++)
+        {
             var friendScore = friendData[fr].scores;
             console.log(friendScore)
             var scoreDiff = [];
+            var currScore=0;
             // console.log(friendData[fr].scores);
             console.log(friendScore[fr])
             console.log(scores);
             for(var sc = 0; sc < friendScore.length; sc++){
-                scoreDiff.push(Math.abs(scores[sc] - friendScore[sc]));
+                currScore+=Math.abs(parseInt(scores[sc]) - parseInt(friendScore[sc]));
+                //scoreDiff.push(Math.abs(scores[sc] - friendScore[sc]));
             }
-            scoreDiff = scoreDiff.reduce(getSum, 0);
-            console.log(scoreDiff)
+            //if current score is lower
+            if(currScore<bestmatch){
+                console.log("switch!");
+                //grab the index of your current best match
+                bestmatchindex=fr;
+                bestmatch=currScore;
+                console.log("curr score"+currScore)
+
+            }
+            //scoreDiff = scoreDiff.reduce(getSum, 0);
+            //console.log(scoreDiff)
         }
+        console.log("find is over bestMatch INDEX: "+bestmatchindex)
+        console.log("best match " + friendData[bestmatchindex].name)
+        return friendData[bestmatchindex];
         });
     };
 
