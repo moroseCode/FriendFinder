@@ -109,19 +109,14 @@
 
                     $.post("/api/friends", addFriend)
                         findFriend(answers).then(function(bestMatch){
+                            $(".palMod").empty();
+
                             $(".palMod").append(
-                                    $("<img>", {src: bestMatch.photo, alt: 'Picture of ' + bestMatch.name }).height('auto').width('auto'),
+                                    $("<img>", {src: bestMatch.photo, alt: 'Picture of ' + bestMatch.name }).height('auto').width('100%'),
                                     $("<h3>").text(bestMatch.name).css("text-align", "center")
                                 );
 
                             $("#friendModal").modal('show');
-                            // $('#modal').on('show.bs.modal', function () {
-                            //     $(this).find('.modal-body').css({
-                            //         width:'auto', //probably not needed
-                            //         height:'auto' !important, //probably not needed 
-                            //         'max-height':'100%'
-                            //     });
-                            // });
                         });
 
                 })
