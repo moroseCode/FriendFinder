@@ -8,7 +8,6 @@ module.exports = function(app) {
     });
 
     app.get("/api/questions", function(req, res) {
-        console.log("questions api")
         res.json(questions);
       });
 
